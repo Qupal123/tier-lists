@@ -14,13 +14,14 @@ body{
   margin:0;
   font-family:system-ui,Arial,sans-serif;
   color:#fff;
+  overscroll-behavior:none;
   background:
     radial-gradient(900px 500px at 0% 0%, #3b1d5a, transparent 60%),
     radial-gradient(900px 500px at 100% 0%, #1d4b5a, transparent 60%),
     linear-gradient(180deg,#0c0c10,#09090d);
 }
 
-/* TOP BAR */
+/* TOP */
 .topbar{
   position:sticky;
   top:0;
@@ -31,34 +32,24 @@ body{
   background:rgba(10,10,15,.85);
   backdrop-filter:blur(6px);
 }
-
 .topbar button{
   flex:1;
   padding:10px;
   border:none;
   border-radius:12px;
   font-weight:700;
-  cursor:pointer;
   color:#fff;
   background:linear-gradient(135deg,#5b7cfa,#8f5bfa);
 }
-
 .topbar button.secondary{
   background:linear-gradient(135deg,#2b2b38,#3a3a4a);
 }
 
 /* MAIN */
-#tierlist{
-  padding:12px;
-  position:relative;
-}
+#tierlist{padding:12px;position:relative}
 
 /* TIERS */
-.tier{
-  display:flex;
-  margin-bottom:6px;
-}
-
+.tier{display:flex;margin-bottom:6px}
 .tier-label{
   width:140px;
   font-weight:800;
@@ -67,7 +58,6 @@ body{
   justify-content:center;
   border-radius:10px 0 0 10px;
 }
-
 .tier-content{
   flex:1;
   min-height:64px;
@@ -79,7 +69,6 @@ body{
   border-radius:0 10px 10px 0;
 }
 
-/* COLORS */
 .imba{background:#ff4d4d}
 .strong{background:#ff944d}
 .good{background:#ffd24d;color:#000}
@@ -95,13 +84,16 @@ body{
   cursor:grab;
   position:relative;
 }
-
 .brawler img{
   width:100%;
   height:100%;
   object-fit:cover;
 }
-
+.brawler.dragging{
+  position:fixed;
+  z-index:9999;
+  pointer-events:none;
+}
 .info{
   position:absolute;
   inset:0;
@@ -111,7 +103,6 @@ body{
   align-items:center;
   justify-content:center;
 }
-
 .brawler.show .info{display:flex}
 
 /* POOL */
@@ -129,25 +120,13 @@ body{
   border-radius:14px;
   display:flex;
   gap:8px;
-  align-items:center;
   pointer-events:none;
-
   background:
     linear-gradient(135deg,rgba(120,140,255,.35),rgba(200,120,255,.35)),
     rgba(10,10,18,.92);
-
   backdrop-filter:blur(10px);
-  box-shadow:
-    0 0 25px rgba(150,120,255,.8),
-    inset 0 0 12px rgba(255,255,255,.12);
+  box-shadow:0 0 25px rgba(150,120,255,.8);
 }
-
-.credit-glow{
-  font-size:10px;
-  letter-spacing:.3em;
-  opacity:.7;
-}
-
 .credit-name{
   font-size:18px;
   font-weight:900;
@@ -157,7 +136,6 @@ body{
   -webkit-text-fill-color:transparent;
   animation:glow 3s ease infinite;
 }
-
 @keyframes glow{
   0%{background-position:0% 50%}
   50%{background-position:100% 50%}
@@ -188,11 +166,10 @@ body{
 
   <div class="tier pool">
     <div class="tier-label">ВСЕ</div>
-    <div class="tier-content" id="pool" data-tier="pool"></div>
+    <div class="tier-content" data-tier="pool"></div>
   </div>
 
   <div id="credit">
-    <span class="credit-glow">АВТОР</span>
     <span class="credit-name">Lapizxx</span>
   </div>
 
@@ -205,13 +182,14 @@ const IMG_SUFFIX='_portrait.png';
 
 const brawlers=[
 '8bit','alli','amber','angelo','ash','barley','bea','belle','berry','bibi','bo','bonnie','brock',
-'bull','buster','buzz','buzz_lightyear','byron','carl','charlie','chester','chuck','clancy',
-'colette','cordelius','crow','darryl','doug','draco','edgar','elprimo','emz','eve','fang','finx',
-'frank','gale','gene','gray','griff','grom','gus','hank','hyper_colt','hyper_dynamike','jacky',
-'Jae-Yong','janet','jessie','juju','Kaze','kenji','kit','larry&lawrie','leon','lily','lola','lou',
-'lumi','maisie','mandy','max','meeple','meg','melodie','mico','Mina','moe','mortis','mrp','nani',
-'nita','ollie','otis','pam','pearl','penny','piper','poco','rico','rosa','rt','ruffs','sam',
-'sandy','shade','Shelly','spike','sprout','squeak','stu','surge','tara','tick','trunk','willow','ziggi'
+'bull','buster','buzz','byron','carl','charlie','chester','chuck','clancy','colette',
+'cordelius','crow','darryl','doug','draco','edgar','elprimo','emz','eve','fang','finx',
+'frank','gale','gene','gray','griff','grom','gus','hank','hyper_colt','hyper_dynamike',
+'jacky','Jae-Yong','janet','jessie','juju','Kaze','kenji','kit','larry&lawrie','leon',
+'lily','lola','lou','lumi','maisie','mandy','max','meeple','meg','melodie','mico','Mina',
+'moe','mortis','mrp','nani','nita','ollie','otis','pam','pearl','penny','piper','poco',
+'rico','rosa','rt','ruffs','sam','sandy','shade','Shelly','spike','sprout','squeak',
+'stu','surge','tara','tick','trunk','willow','ziggi'
 ];
 
 let saved=JSON.parse(localStorage.getItem(STORAGE_KEY)||'{}');
@@ -223,15 +201,14 @@ function render(){
   brawlers.forEach(id=>{
     const el=document.createElement('div');
     el.className='brawler';
-    el.draggable=true;
     el.innerHTML=`
-      <img src="${IMG_PATH+id+IMG_SUFFIX}" onerror="this.src='${IMG_PATH+id}_portrait.PNG'">
+      <img src="${IMG_PATH+id+IMG_SUFFIX}"
+           onerror="this.onerror=null;this.src='${IMG_PATH+id}_portrait.PNG'">
       <div class="info">${id}</div>`;
     el.onclick=()=>el.classList.toggle('show');
 
-    el.ondragstart=e=>e.dataTransfer.setData('id',id);
-
     el.addEventListener('touchstart',e=>{
+      e.preventDefault();
       touchItem=el;
       el.classList.add('dragging');
     });
@@ -241,29 +218,18 @@ function render(){
   });
 }
 
-/* DROP */
-document.querySelectorAll('.tier-content').forEach(zone=>{
-  zone.ondragover=e=>e.preventDefault();
-  zone.ondrop=e=>{
-    e.preventDefault();
-    const id=e.dataTransfer.getData('id');
-    saved[id]=zone.dataset.tier;
-    localStorage.setItem(STORAGE_KEY,JSON.stringify(saved));
-    render();
-  };
-});
-
 /* TOUCH MOVE + AUTOSCROLL */
 document.addEventListener('touchmove',e=>{
   if(!touchItem)return;
   e.preventDefault();
 
   const t=e.touches[0];
-  const EDGE=80;
-  const SPEED=18;
+  touchItem.style.left=(t.clientX-28)+'px';
+  touchItem.style.top =(t.clientY-28)+'px';
 
-  if(t.clientY<EDGE) window.scrollBy(0,-SPEED);
-  else if(t.clientY>innerHeight-EDGE) window.scrollBy(0,SPEED);
+  const EDGE=90, SPEED=24;
+  if(t.clientY<EDGE) scrollBy(0,-SPEED);
+  else if(t.clientY>innerHeight-EDGE) scrollBy(0,SPEED);
 
   const el=document.elementFromPoint(t.clientX,t.clientY);
   const zone=el?.closest('.tier-content');
@@ -275,14 +241,15 @@ document.addEventListener('touchmove',e=>{
 },{passive:false});
 
 document.addEventListener('touchend',()=>{
-  if(touchItem){
-    localStorage.setItem(STORAGE_KEY,JSON.stringify(saved));
-    touchItem.classList.remove('dragging');
-    touchItem=null;
-  }
+  if(!touchItem)return;
+  touchItem.classList.remove('dragging');
+  touchItem.style.left='';
+  touchItem.style.top='';
+  localStorage.setItem(STORAGE_KEY,JSON.stringify(saved));
+  touchItem=null;
 });
 
-/* EXPORT / IMPORT */
+/* JSON */
 function exportJSON(){
   const b=new Blob([JSON.stringify(saved,null,2)],{type:'application/json'});
   const a=document.createElement('a');
@@ -290,7 +257,6 @@ function exportJSON(){
   a.download='tierlist.json';
   a.click();
 }
-
 function importJSON(){
   const i=document.createElement('input');
   i.type='file';i.accept='.json';
@@ -312,7 +278,7 @@ function downloadImage(){
   .then(c=>{
     const url=c.toDataURL('image/png');
     if(/Android|iPhone|iPad/i.test(navigator.userAgent)){
-      const w=window.open();
+      const w=window.open('');
       w.document.write(`<img src="${url}" style="width:100%">`);
       return;
     }
