@@ -42,10 +42,7 @@ body{
 }
 
 /* MAIN */
-#tierlist{
-  padding:12px;
-  position:relative;
-}
+#tierlist{padding:12px;position:relative}
 
 /* TIERS */
 .tier{display:flex;margin-bottom:6px}
@@ -170,22 +167,45 @@ body{
 <script>
 const STORAGE_KEY='bs-tierlist';
 const IMG_PATH='brawlers/';
-const IMG_SUFFIX='_portrait.png';
 
-const brawlers = [
-  '8bit','amber','angelo','ash','barley','bea','belle','berry','bibi','bo','bonnie','brock',
-  'bull','buster','buzz','byron','carl','charlie','chester','chuck','clancy','colette',
-  'cordelius','crow','darryl','doug','draco','edgar','elprimo','emz','eve',
-  'finx','fang','frank','gale','gene','gray','griff','grom','gus','hank',
-  'hyper_colt','hyper_dynamike','jacky',
-  'Jae-Yong','janet','jessie','juju','Kaze','kenji','kit',
-  'larry&lawrie','leon','lily','lola','lou','lumi','maisie','mandy','max','meeple','meg',
-  'melodie','mico','Mina','moe','mortis','mrp','nani','nita','ollie','otis','pam','pearl',
-  'penny','piper','poco','rico','rosa','rt','ruffs','sam','sandy','shade',
-  'Shelly','spike','sprout','squeak','stu','surge','tara','tick','trunk','willow','ziggi'
+const brawlers=[
+'8bit','amber','angelo','ash','barley','bea','belle','berry','bibi','bo','bonnie','brock',
+'bull','buster','buzz','byron','carl','charlie','chester','chuck','clancy','colette',
+'cordelius','crow','darryl','doug','draco','edgar','elprimo','emz','eve','fang','finx','frank',
+'gale','gene','gray','griff','grom','gus','hank','hyper_colt','hyper_dynamike','jacky',
+'janet','jessie','juju','kenji','kit','leon','lily','lola','lou','lumi','maisie','mandy',
+'max','meeple','meg','melodie','mico','moe','mortis','mrp','nani','nita','ollie','otis',
+'pam','pearl','penny','piper','poco','rico','rosa','rt','ruffs','sam','sandy','shade',
+'spike','sprout','squeak','stu','surge','tara','tick','trunk','willow',
+'Shelly','Jae-Yong','Kaze','Mina','GIGI','Glouber','PIERCE','larry&lawrie','ziggi'
 ];
 
 let saved=JSON.parse(localStorage.getItem(STORAGE_KEY)||'{}');
+
+/* SMART IMAGE LOADER */
+function createBrawlerImage(id){
+  const img=document.createElement('img');
+  const variants=[
+    `${id}_portrait.png`,
+    `${id}_portrait.PNG`,
+    `${id.toLowerCase()}_portrait.png`,
+    `${id.toLowerCase()}_portrait.PNG`,
+    `${id.toUpperCase()}_portrait.png`,
+    `${id.toUpperCase()}_portrait.PNG`
+  ];
+  let i=0;
+  function tryNext(){
+    if(i>=variants.length){
+      console.warn('❌ Нет картинки:',id);
+      img.style.display='none';
+      return;
+    }
+    img.src=IMG_PATH+variants[i++];
+  }
+  img.onerror=tryNext;
+  tryNext();
+  return img;
+}
 
 function render(){
   document.querySelectorAll('.tier-content').forEach(z=>z.innerHTML='');
@@ -193,7 +213,11 @@ function render(){
     const el=document.createElement('div');
     el.className='brawler';
     el.id=id;
-    el.innerHTML=`<img src="${IMG_PATH+id+IMG_SUFFIX}"><div class="info">${id}</div>`;
+    el.appendChild(createBrawlerImage(id));
+    const info=document.createElement('div');
+    info.className='info';
+    info.textContent=id;
+    el.appendChild(info);
     el.onclick=()=>el.classList.toggle('show');
     el.draggable=true;
     el.ondragstart=e=>e.dataTransfer.setData('id',id);
@@ -216,7 +240,6 @@ document.querySelectorAll('.tier-content').forEach(zone=>{
 
 /* ANDROID TOUCH DRAG */
 let touchItem=null;
-
 document.addEventListener('touchstart',e=>{
   const b=e.target.closest('.brawler');
   if(!b)return;
@@ -273,6 +296,6 @@ function downloadImage(){
   });
 }
 </script>
+
 </body>
 </html>
-
