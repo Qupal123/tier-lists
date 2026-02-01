@@ -2,90 +2,57 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Brawl Stars Tier List</title>
 
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
 <style>
 *{box-sizing:border-box}
-
-html,body{
-  margin:0;
-  height:100%;
-  font-family:system-ui,Arial,sans-serif;
-  color:#fff;
-  overflow-x:hidden;
-}
+html,body{margin:0;font-family:system-ui,Arial,sans-serif;color:#fff}
 
 /* ===== BACKGROUND ===== */
 #bg{
-  position:fixed;
-  inset:0;
-  z-index:-2;
+  position:fixed;inset:0;z-index:-2;
   background:
     radial-gradient(900px 500px at 0% 0%, #3b1d5a, transparent 60%),
     radial-gradient(900px 500px at 100% 0%, #1d4b5a, transparent 60%),
     linear-gradient(180deg,#0c0c10,#09090d);
 }
-#particles{
-  position:fixed;
-  inset:0;
-  z-index:-1;
-}
+#particles{position:fixed;inset:0;z-index:-1}
 
 /* ===== TOP BAR ===== */
 .topbar{
-  position:sticky;
-  top:0;
-  z-index:1000;
-  display:flex;
-  gap:8px;
-  padding:10px;
+  position:sticky;top:0;z-index:1000;
+  display:flex;gap:8px;padding:10px;
   backdrop-filter:blur(8px);
   background:rgba(10,10,15,.85);
 }
 .topbar button{
-  flex:1;
-  padding:10px;
-  border:none;
-  border-radius:12px;
-  font-weight:700;
-  cursor:pointer;
-  color:#fff;
+  flex:1;padding:10px;border:none;border-radius:14px;
+  font-weight:700;color:#fff;
   background:linear-gradient(135deg,#5b7cfa,#8f5bfa);
-}
-.topbar button.secondary{
-  background:linear-gradient(135deg,#2b2b38,#3a3a4a);
 }
 
 /* ===== MAIN ===== */
 #tierlist{
   padding:12px;
-  position:relative;
+  padding-bottom:calc(16px + env(safe-area-inset-bottom));
 }
 
 /* ===== TIERS ===== */
 .tier{display:flex;margin-bottom:6px}
 .tier-label{
-  width:140px;
-  font-weight:800;
-  display:flex;
-  align-items:center;
-  justify-content:center;
+  width:140px;font-weight:800;
+  display:flex;align-items:center;justify-content:center;
   border-radius:10px 0 0 10px;
 }
 .tier-content{
-  flex:1;
-  min-height:64px;
-  display:flex;
-  flex-wrap:wrap;
-  gap:4px;
-  padding:4px;
+  flex:1;min-height:64px;
+  display:flex;flex-wrap:wrap;gap:4px;padding:4px;
   background:rgba(20,20,30,.9);
   border-radius:0 10px 10px 0;
 }
-
 .imba{background:#ff4d4d}
 .strong{background:#ff944d}
 .good{background:#ffd24d;color:#000}
@@ -93,47 +60,21 @@ html,body{
 .weak{background:#70a1ff}
 
 /* ===== BRAWLER ===== */
-.brawler{
-  width:56px;
-  height:56px;
-  border-radius:8px;
-  overflow:hidden;
-  position:relative;
-}
-.brawler img{
-  width:100%;
-  height:100%;
-  object-fit:cover;
-}
-.brawler.dragging{
-  position:fixed;
-  z-index:9999;
-  pointer-events:none;
-}
-.info{
-  position:absolute;
-  inset:0;
-  display:none;
-  background:rgba(0,0,0,.85);
-  font-size:11px;
-  align-items:center;
-  justify-content:center;
-}
-.brawler.show .info{display:flex}
+.brawler{width:56px;height:56px;border-radius:8px;overflow:hidden}
+.brawler img{width:100%;height:100%;object-fit:cover}
+.brawler.dragging{position:fixed;z-index:9999;pointer-events:none}
 
 /* ===== POOL ===== */
 .pool{
   margin-top:12px;
   border:2px dashed rgba(255,255,255,.2);
+  margin-bottom:calc(24px + env(safe-area-inset-bottom));
 }
 
 /* ===== CREDIT ===== */
 #credit{
-  position:absolute;
-  right:16px;
-  top:12px;
-  padding:10px 16px;
-  border-radius:16px;
+  position:fixed;right:14px;top:14px;
+  padding:10px 16px;border-radius:16px;
   pointer-events:none;
   background:
     linear-gradient(135deg,rgba(120,140,255,.35),rgba(200,120,255,.35)),
@@ -141,9 +82,8 @@ html,body{
   backdrop-filter:blur(10px);
   box-shadow:0 0 30px rgba(150,120,255,.9);
 }
-.credit-name{
-  font-size:20px;
-  font-weight:900;
+#credit span{
+  font-size:18px;font-weight:900;
   background:linear-gradient(135deg,#9bb4ff,#d79bff,#9bffef);
   background-size:300% 300%;
   -webkit-background-clip:text;
@@ -165,12 +105,11 @@ html,body{
 
 <div class="topbar">
   <button onclick="exportJSON()">Экспорт JSON</button>
-  <button class="secondary" onclick="importJSON()">Импорт JSON</button>
+  <button onclick="importJSON()">Импорт JSON</button>
   <button onclick="downloadImage()">Скачать PNG</button>
 </div>
 
 <div id="tierlist">
-
   <div class="tier"><div class="tier-label imba">ИМБА</div><div class="tier-content" data-tier="imba"></div></div>
   <div class="tier"><div class="tier-label strong">ОЧЕНЬ СИЛЬНЫЕ</div><div class="tier-content" data-tier="strong"></div></div>
   <div class="tier"><div class="tier-label good">ХОРОШИЕ</div><div class="tier-content" data-tier="good"></div></div>
@@ -181,74 +120,154 @@ html,body{
     <div class="tier-label">ВСЕ</div>
     <div class="tier-content" data-tier="pool"></div>
   </div>
-
-  <div id="credit"><span class="credit-name">Lapizxx</span></div>
 </div>
 
+<div id="credit"><span>Lapizxx</span></div>
+
 <script>
-/* ================== DATA ================== */
+/* ================= DATA ================= */
 const STORAGE_KEY='bs-tierlist';
 const IMG_PATH='brawlers/';
 
 const brawlers=[
-'8bit','alli','amber','angelo','ash','barley','bea','belle','berry','bibi','bo','bonnie','brock',
-'bull','buster','buzz','byron','carl','charlie','chester','chuck','clancy','colette',
-'cordelius','crow','darryl','doug','draco','edgar','elprimo','emz','eve','fang','finx',
-'frank','gale','gene','gigi','glouber','griff','grom','gus','hank','hyper_colt','hyper_dynamike',
-'jacky','jae-yong','janet','jessie','juju','kaze','kenji','kit','larry&lawrie','leon',
-'lily','lola','lou','lumi','maisie','mandy','max','meeple','meg','melodie','mico','mina',
-'moe','mortis','mrp','nani','nita','ollie','otis','pam','pearl','penny','pierce','piper',
-'poco','rico','rosa','rt','ruffs','sam','sandy','shade','shelly','spike','sprout','squeak',
-'stu','surge','tara','tick','trunk','willow','ziggi'
+  // 🔴 СПЕЦИАЛЬНЫЕ
+  {id:'gigi',file:'GIGI_portrait.png'},
+  {id:'pierce',file:'PIERCE_portrait.png'},
+  {id:'glouber',file:'Glouber_portrait.PNG'},
+
+  // 🟢 ОСНОВНЫЕ (99 всего)
+  {id:'8bit',file:'8bit_portrait.png'},
+  {id:'alli',file:'alli_portrait.png'},
+  {id:'amber',file:'amber_portrait.png'},
+  {id:'angelo',file:'angelo_portrait.png'},
+  {id:'ash',file:'ash_portrait.png'},
+  {id:'barley',file:'barley_portrait.png'},
+  {id:'bea',file:'bea_portrait.png'},
+  {id:'belle',file:'belle_portrait.png'},
+  {id:'berry',file:'berry_portrait.png'},
+  {id:'bibi',file:'bibi_portrait.png'},
+  {id:'bo',file:'bo_portrait.png'},
+  {id:'bonnie',file:'bonnie_portrait.png'},
+  {id:'brock',file:'brock_portrait.png'},
+  {id:'bull',file:'bull_portrait.png'},
+  {id:'buster',file:'buster_portrait.png'},
+  {id:'buzz',file:'buzz_portrait.png'},
+  {id:'buzz_lightyear',file:'buzz_lightyear_portrait.png'},
+  {id:'byron',file:'byron_portrait.png'},
+  {id:'carl',file:'carl_portrait.png'},
+  {id:'charlie',file:'charlie_portrait.png'},
+  {id:'chester',file:'chester_portrait.png'},
+  {id:'chuck',file:'chuck_portrait.png'},
+  {id:'clancy',file:'clancy_portrait.png'},
+  {id:'colette',file:'colette_portrait.png'},
+  {id:'cordelius',file:'cordelius_portrait.png'},
+  {id:'crow',file:'crow_portrait.png'},
+  {id:'darryl',file:'darryl_portrait.png'},
+  {id:'doug',file:'doug_portrait.png'},
+  {id:'draco',file:'draco_portrait.png'},
+  {id:'edgar',file:'edgar_portrait.png'},
+  {id:'elprimo',file:'elprimo_portrait.png'},
+  {id:'emz',file:'emz_portrait.png'},
+  {id:'eve',file:'eve_portrait.png'},
+  {id:'fang',file:'fang_portrait.png'},
+  {id:'finx',file:'finx_portrait.png'},
+  {id:'frank',file:'frank_portrait.png'},
+  {id:'gale',file:'gale_portrait.png'},
+  {id:'gene',file:'gene_portrait.png'},
+  {id:'gray',file:'gray_portrait.png'},
+  {id:'griff',file:'griff_portrait.png'},
+  {id:'grom',file:'grom_portrait.png'},
+  {id:'gus',file:'gus_portrait.png'},
+  {id:'hank',file:'hank_portrait.png'},
+  {id:'hyper_colt',file:'hyper_colt_portrait.png'},
+  {id:'hyper_dynamike',file:'hyper_dynamike_portrait.png'},
+  {id:'jacky',file:'jacky_portrait.png'},
+  {id:'Jae-Yong',file:'Jae-Yong_portrait.png'},
+  {id:'janet',file:'janet_portrait.png'},
+  {id:'jessie',file:'jessie_portrait.png'},
+  {id:'juju',file:'juju_portrait.png'},
+  {id:'kaze',file:'Kaze_portrait.png'},
+  {id:'kenji',file:'kenji_portrait.png'},
+  {id:'kit',file:'kit_portrait.png'},
+  {id:'larry&lawrie',file:'larry&lawrie_portrait.png'},
+  {id:'leon',file:'leon_portrait.png'},
+  {id:'lily',file:'lily_portrait.png'},
+  {id:'lola',file:'lola_portrait.png'},
+  {id:'lou',file:'lou_portrait.png'},
+  {id:'lumi',file:'lumi_portrait.png'},
+  {id:'maisie',file:'maisie_portrait.png'},
+  {id:'mandy',file:'mandy_portrait.png'},
+  {id:'max',file:'max_portrait.png'},
+  {id:'meeple',file:'meeple_portrait.png'},
+  {id:'meg',file:'meg_portrait.png'},
+  {id:'melodie',file:'melodie_portrait.png'},
+  {id:'mico',file:'mico_portrait.png'},
+  {id:'Mina',file:'Mina_portrait.png'},
+  {id:'moe',file:'moe_portrait.png'},
+  {id:'mortis',file:'mortis_portrait.png'},
+  {id:'mrp',file:'mrp_portrait.png'},
+  {id:'nani',file:'nani_portrait.png'},
+  {id:'nita',file:'nita_portrait.png'},
+  {id:'ollie',file:'ollie_portrait.png'},
+  {id:'otis',file:'otis_portrait.png'},
+  {id:'pam',file:'pam_portrait.png'},
+  {id:'pearl',file:'pearl_portrait.png'},
+  {id:'penny',file:'penny_portrait.png'},
+  {id:'piper',file:'piper_portrait.png'},
+  {id:'poco',file:'poco_portrait.png'},
+  {id:'rico',file:'rico_portrait.png'},
+  {id:'rosa',file:'rosa_portrait.png'},
+  {id:'rt',file:'rt_portrait.png'},
+  {id:'ruffs',file:'ruffs_portrait.png'},
+  {id:'sam',file:'sam_portrait.png'},
+  {id:'sandy',file:'sandy_portrait.png'},
+  {id:'shade',file:'shade_portrait.png'},
+  {id:'Shelly',file:'Shelly_portrait.png'},
+  {id:'spike',file:'spike_portrait.png'},
+  {id:'sprout',file:'sprout_portrait.png'},
+  {id:'squeak',file:'squeak_portrait.png'},
+  {id:'stu',file:'stu_portrait.png'},
+  {id:'surge',file:'surge_portrait.png'},
+  {id:'tara',file:'tara_portrait.png'},
+  {id:'tick',file:'tick_portrait.png'},
+  {id:'trunk',file:'trunk_portrait.png'},
+  {id:'willow',file:'willow_portrait.png'},
+  {id:'ziggi',file:'ziggi_portrait.png'}
 ];
 
 let saved=JSON.parse(localStorage.getItem(STORAGE_KEY)||'{}');
 let touchItem=null;
 
-/* ================== RENDER ================== */
+/* ================= RENDER ================= */
 function render(){
   document.querySelectorAll('.tier-content').forEach(z=>z.innerHTML='');
-
-  brawlers.forEach(id=>{
+  brawlers.forEach(b=>{
     const el=document.createElement('div');
     el.className='brawler';
-
-    el.innerHTML=`
-      <img src="${IMG_PATH+id}_portrait.png"
-           onerror="this.onerror=null;this.parentElement.remove();">
-      <div class="info">${id}</div>`;
-
-    el.onclick=()=>el.classList.toggle('show');
-
+    el.innerHTML=`<img src="${IMG_PATH+b.file}">`;
     el.addEventListener('touchstart',e=>{
       e.preventDefault();
       touchItem=el;
       el.classList.add('dragging');
     });
-
-    const tier=saved[id]||'pool';
+    const tier=saved[b.id]||'pool';
     document.querySelector(`[data-tier="${tier}"]`).appendChild(el);
   });
 }
 
-/* ================== TOUCH DRAG ================== */
+/* ================= TOUCH ================= */
 document.addEventListener('touchmove',e=>{
   if(!touchItem)return;
   e.preventDefault();
-
   const t=e.touches[0];
   touchItem.style.left=(t.clientX-28)+'px';
   touchItem.style.top =(t.clientY-28)+'px';
-
-  const EDGE=90,SPEED=22;
-  if(t.clientY<EDGE)scrollBy(0,-SPEED);
-  else if(t.clientY>innerHeight-EDGE)scrollBy(0,SPEED);
-
   const el=document.elementFromPoint(t.clientX,t.clientY);
   const zone=el?.closest('.tier-content');
   if(zone){
-    const id=touchItem.querySelector('.info').textContent;
-    saved[id]=zone.dataset.tier;
+    const file=touchItem.querySelector('img').src.split('/').pop();
+    const b=brawlers.find(x=>x.file===file);
+    if(b) saved[b.id]=zone.dataset.tier;
   }
 },{passive:false});
 
@@ -262,7 +281,30 @@ document.addEventListener('touchend',()=>{
   touchItem=null;
 });
 
-/* ================== JSON ================== */
+/* ================= PNG ================= */
+function downloadImage(){
+  html2canvas(document.getElementById('tierlist'),{backgroundColor:null,useCORS:true})
+  .then(canvas=>{
+    const url=canvas.toDataURL('image/png');
+    const old=document.getElementById('png-preview');
+    if(old)old.remove();
+    const img=document.createElement('img');
+    img.id='png-preview';
+    img.src=url;
+    img.style.position='fixed';
+    img.style.inset='0';
+    img.style.margin='auto';
+    img.style.maxWidth='100%';
+    img.style.maxHeight='100%';
+    img.style.zIndex='99999';
+    img.style.background='#000';
+    img.onclick=()=>img.remove();
+    document.body.appendChild(img);
+    alert('Зажми изображение и выбери «Сохранить»');
+  });
+}
+
+/* ================= JSON ================= */
 function exportJSON(){
   const b=new Blob([JSON.stringify(saved,null,2)],{type:'application/json'});
   const a=document.createElement('a');
@@ -285,56 +327,21 @@ function importJSON(){
   i.click();
 }
 
-/* ================== PNG ================== */
-function downloadImage(){
-  html2canvas(document.getElementById('tierlist'),{backgroundColor:null,useCORS:true})
-  .then(canvas=>{
-    const url=canvas.toDataURL('image/png');
-    if(/Android|iPhone|iPad/i.test(navigator.userAgent)){
-      const w=window.open('');
-      if(!w){alert('Разреши всплывающие окна');return;}
-      w.document.write(`<img src="${url}" style="width:100%">`);
-    }else{
-      const a=document.createElement('a');
-      a.href=url;a.download='tierlist.png';
-      a.click();
-    }
-  });
-}
-
-/* ================== PARTICLES ================== */
+/* ================= PARTICLES ================= */
 const c=document.getElementById('particles');
 const ctx=c.getContext('2d');
 let W,H,parts=[];
-function resize(){
-  W=c.width=innerWidth;
-  H=c.height=innerHeight;
-}
+function resize(){W=c.width=innerWidth;H=c.height=innerHeight}
 resize();addEventListener('resize',resize);
-
-for(let i=0;i<80;i++){
-  parts.push({
-    x:Math.random()*W,
-    y:Math.random()*H,
-    r:Math.random()*2+1,
-    v:Math.random()*0.3+0.1
-  });
-}
+for(let i=0;i<70;i++)parts.push({x:Math.random()*W,y:Math.random()*H,r:Math.random()*2+1,v:Math.random()*0.3+0.1});
 (function loop(){
   ctx.clearRect(0,0,W,H);
   ctx.fillStyle='rgba(180,160,255,.35)';
-  parts.forEach(p=>{
-    p.y-=p.v;
-    if(p.y<0)p.y=H;
-    ctx.beginPath();
-    ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
-    ctx.fill();
-  });
+  parts.forEach(p=>{p.y-=p.v;if(p.y<0)p.y=H;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fill()});
   requestAnimationFrame(loop);
 })();
 
 render();
 </script>
-
 </body>
 </html>
