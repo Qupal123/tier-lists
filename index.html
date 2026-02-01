@@ -21,7 +21,7 @@ body{
     linear-gradient(180deg,#0c0c10,#09090d);
 }
 
-/* TOP */
+/* TOP BAR */
 .topbar{
   position:sticky;
   top:0;
@@ -39,6 +39,7 @@ body{
   border-radius:12px;
   font-weight:700;
   color:#fff;
+  cursor:pointer;
   background:linear-gradient(135deg,#5b7cfa,#8f5bfa);
 }
 .topbar button.secondary{
@@ -81,7 +82,6 @@ body{
   height:56px;
   border-radius:8px;
   overflow:hidden;
-  cursor:grab;
   position:relative;
 }
 .brawler img{
@@ -118,8 +118,6 @@ body{
   top:12px;
   padding:8px 14px;
   border-radius:14px;
-  display:flex;
-  gap:8px;
   pointer-events:none;
   background:
     linear-gradient(135deg,rgba(120,140,255,.35),rgba(200,120,255,.35)),
@@ -140,10 +138,6 @@ body{
   0%{background-position:0% 50%}
   50%{background-position:100% 50%}
   100%{background-position:0% 50%}
-}
-
-@media(max-width:600px){
-  .tier-label{width:100px;font-size:12px}
 }
 </style>
 </head>
@@ -169,9 +163,7 @@ body{
     <div class="tier-content" data-tier="pool"></div>
   </div>
 
-  <div id="credit">
-    <span class="credit-name">Lapizxx</span>
-  </div>
+  <div id="credit"><span class="credit-name">Lapizxx</span></div>
 
 </div>
 
@@ -180,15 +172,16 @@ const STORAGE_KEY='bs-tierlist';
 const IMG_PATH='brawlers/';
 const IMG_SUFFIX='_portrait.png';
 
+/* 🔥 ВСЕ ПЕРСЫ (ВКЛЮЧАЯ GIGI / GLOUBER / PIERCE) */
 const brawlers=[
 '8bit','alli','amber','angelo','ash','barley','bea','belle','berry','bibi','bo','bonnie','brock',
 'bull','buster','buzz','byron','carl','charlie','chester','chuck','clancy','colette',
 'cordelius','crow','darryl','doug','draco','edgar','elprimo','emz','eve','fang','finx',
-'frank','gale','gene','gray','griff','grom','gus','hank','hyper_colt','hyper_dynamike',
-'jacky','Jae-Yong','janet','jessie','juju','Kaze','kenji','kit','larry&lawrie','leon',
-'lily','lola','lou','lumi','maisie','mandy','max','meeple','meg','melodie','mico','Mina',
-'moe','mortis','mrp','nani','nita','ollie','otis','pam','pearl','penny','piper','poco',
-'rico','rosa','rt','ruffs','sam','sandy','shade','Shelly','spike','sprout','squeak',
+'frank','gale','gene','gigi','glouber','griff','grom','gus','hank','hyper_colt','hyper_dynamike',
+'jacky','jae-yong','janet','jessie','juju','kaze','kenji','kit','larry&lawrie','leon',
+'lily','lola','lou','lumi','maisie','mandy','max','meeple','meg','melodie','mico','mina',
+'moe','mortis','mrp','nani','nita','ollie','otis','pam','pearl','penny','pierce','piper',
+'poco','rico','rosa','rt','ruffs','sam','sandy','shade','shelly','spike','sprout','squeak',
 'stu','surge','tara','tick','trunk','willow','ziggi'
 ];
 
@@ -202,8 +195,16 @@ function render(){
     const el=document.createElement('div');
     el.className='brawler';
     el.innerHTML=`
-      <img src="${IMG_PATH+id+IMG_SUFFIX}"
-           onerror="this.onerror=null;this.src='${IMG_PATH+id}_portrait.PNG'">
+      <img
+        src="${IMG_PATH+id+IMG_SUFFIX}"
+        onerror="
+          this.onerror=null;
+          this.src='${IMG_PATH+id.charAt(0).toUpperCase()+id.slice(1)}_portrait.png';
+          this.onerror=function(){
+            this.onerror=null;
+            this.src='${IMG_PATH+id.toUpperCase()}_portrait.png';
+          };
+        ">
       <div class="info">${id}</div>`;
     el.onclick=()=>el.classList.toggle('show');
 
@@ -222,14 +223,14 @@ function render(){
 document.addEventListener('touchmove',e=>{
   if(!touchItem)return;
   e.preventDefault();
-
   const t=e.touches[0];
+
   touchItem.style.left=(t.clientX-28)+'px';
   touchItem.style.top =(t.clientY-28)+'px';
 
-  const EDGE=90, SPEED=24;
-  if(t.clientY<EDGE) scrollBy(0,-SPEED);
-  else if(t.clientY>innerHeight-EDGE) scrollBy(0,SPEED);
+  const EDGE=90,SPEED=24;
+  if(t.clientY<EDGE)scrollBy(0,-SPEED);
+  else if(t.clientY>innerHeight-EDGE)scrollBy(0,SPEED);
 
   const el=document.elementFromPoint(t.clientX,t.clientY);
   const zone=el?.closest('.tier-content');
@@ -272,12 +273,12 @@ function importJSON(){
   i.click();
 }
 
-/* PNG */
+/* PNG FIX */
 function downloadImage(){
   html2canvas(document.getElementById('tierlist'),{backgroundColor:null,useCORS:true})
   .then(c=>{
     const url=c.toDataURL('image/png');
-    if(/Android|iPhone|iPad/i.test(navigator.userAgent)){
+    if(/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)){
       const w=window.open('');
       w.document.write(`<img src="${url}" style="width:100%">`);
       return;
