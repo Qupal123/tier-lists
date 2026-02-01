@@ -38,8 +38,8 @@ body{
   border:none;
   border-radius:12px;
   font-weight:700;
-  color:#fff;
   cursor:pointer;
+  color:#fff;
   background:linear-gradient(135deg,#5b7cfa,#8f5bfa);
 }
 .topbar button.secondary{
@@ -170,9 +170,8 @@ body{
 <script>
 const STORAGE_KEY='bs-tierlist';
 const IMG_PATH='brawlers/';
-const IMG_SUFFIX='_portrait.png';
 
-/* 🔥 ВСЕ ПЕРСЫ (ВКЛЮЧАЯ GIGI / GLOUBER / PIERCE) */
+/* ВСЕ ПЕРСЫ (ВКЛЮЧАЯ GLOUBER / GIGI / PIERCE) */
 const brawlers=[
 '8bit','alli','amber','angelo','ash','barley','bea','belle','berry','bibi','bo','bonnie','brock',
 'bull','buster','buzz','byron','carl','charlie','chester','chuck','clancy','colette',
@@ -191,21 +190,28 @@ let touchItem=null;
 /* RENDER */
 function render(){
   document.querySelectorAll('.tier-content').forEach(z=>z.innerHTML='');
+
   brawlers.forEach(id=>{
     const el=document.createElement('div');
     el.className='brawler';
+
     el.innerHTML=`
       <img
-        src="${IMG_PATH+id+IMG_SUFFIX}"
+        src="${IMG_PATH+id}_portrait.png"
         onerror="
           this.onerror=null;
           this.src='${IMG_PATH+id.charAt(0).toUpperCase()+id.slice(1)}_portrait.png';
           this.onerror=function(){
             this.onerror=null;
             this.src='${IMG_PATH+id.toUpperCase()}_portrait.png';
+            this.onerror=function(){
+              this.onerror=null;
+              this.src='${IMG_PATH+id.charAt(0).toUpperCase()+id.slice(1)}_portrait.PNG';
+            };
           };
         ">
       <div class="info">${id}</div>`;
+
     el.onclick=()=>el.classList.toggle('show');
 
     el.addEventListener('touchstart',e=>{
@@ -223,8 +229,8 @@ function render(){
 document.addEventListener('touchmove',e=>{
   if(!touchItem)return;
   e.preventDefault();
-  const t=e.touches[0];
 
+  const t=e.touches[0];
   touchItem.style.left=(t.clientX-28)+'px';
   touchItem.style.top =(t.clientY-28)+'px';
 
@@ -273,20 +279,25 @@ function importJSON(){
   i.click();
 }
 
-/* PNG FIX */
+/* PNG */
 function downloadImage(){
   html2canvas(document.getElementById('tierlist'),{backgroundColor:null,useCORS:true})
-  .then(c=>{
-    const url=c.toDataURL('image/png');
+  .then(canvas=>{
+    const url=canvas.toDataURL('image/png');
+
     if(/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)){
       const w=window.open('');
+      if(!w){alert('Разреши всплывающие окна');return;}
       w.document.write(`<img src="${url}" style="width:100%">`);
       return;
     }
+
     const a=document.createElement('a');
     a.href=url;
     a.download='tierlist.png';
+    document.body.appendChild(a);
     a.click();
+    a.remove();
   });
 }
 
