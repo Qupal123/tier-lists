@@ -172,16 +172,17 @@ const STORAGE_KEY='bs-tierlist';
 const IMG_PATH='brawlers/';
 const IMG_SUFFIX='_portrait.png';
 
-const brawlers=[
-'8bit','amber','angelo','ash','barley','bea','belle','berry','bibi','bo','bonnie','brock',
-'bull','buster','buzz','byron','carl','charlie','chester','chuck','clancy','colette',
-'cordelius','crow','darryl','doug','draco','edgar','elprimo','emz','eve','fang','frank',
-'gale','gene','gray','griff','grom','gus','hank','hyper_colt','hyper_dynamike','jacky',
-'jae-yong','janet','jessie','juju','kaze','kenji','kit','larrylawrie','leon','lily','lola',
-'lou','lumi','maisie','mandy','max','meeple','meg','melodie','mico','mina','moe','mortis',
-'mrp','nani','nita','ollie','otis','pam','pearl','penny','piper','poco','rico','rosa','rt',
-'ruffs','sam','sandy','shade','shelly','spike','sprout','squeak','stu','surge','tara','tick',
-'trunk','willow','ziggi'
+const brawlers = [
+  '8bit','amber','angelo','ash','barley','bea','belle','berry','bibi','bo','bonnie','brock',
+  'bull','buster','buzz','byron','carl','charlie','chester','chuck','clancy','colette',
+  'cordelius','crow','darryl','doug','draco','edgar','elprimo','emz','eve',
+  'finx','fang','frank','gale','gene','gray','griff','grom','gus','hank',
+  'hyper_colt','hyper_dynamike','jacky',
+  'Jae-Yong','janet','jessie','juju','Kaze','kenji','kit',
+  'larry&lawrie','leon','lily','lola','lou','lumi','maisie','mandy','max','meeple','meg',
+  'melodie','mico','Mina','moe','mortis','mrp','nani','nita','ollie','otis','pam','pearl',
+  'penny','piper','poco','rico','rosa','rt','ruffs','sam','sandy','shade',
+  'Shelly','spike','sprout','squeak','stu','surge','tara','tick','trunk','willow','ziggi'
 ];
 
 let saved=JSON.parse(localStorage.getItem(STORAGE_KEY)||'{}');
@@ -274,3 +275,4 @@ function downloadImage(){
 </script>
 </body>
 </html>
+
