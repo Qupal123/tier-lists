@@ -8,182 +8,140 @@
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
 <style>
-* { box-sizing: border-box; }
+*{box-sizing:border-box}
 
-body {
-  margin: 0;
+body{
+  margin:0;
+  font-family:system-ui,Arial,sans-serif;
+  color:#fff;
   background:
     radial-gradient(900px 500px at 0% 0%, #3b1d5a, transparent 60%),
     radial-gradient(900px 500px at 100% 0%, #1d4b5a, transparent 60%),
-    linear-gradient(180deg, #0c0c10, #09090d);
-  font-family: system-ui, Arial, sans-serif;
-  color: #fff;
+    linear-gradient(180deg,#0c0c10,#09090d);
 }
 
-/* ===== TOP BAR ===== */
-.topbar {
-  position: sticky;
-  top: 0;
-  z-index: 1000;
-  display: flex;
-  gap: 8px;
-  padding: 10px;
-  background: rgba(10,10,15,0.85);
-  backdrop-filter: blur(6px);
-  border-bottom: 1px solid rgba(255,255,255,0.08);
+/* TOP BAR */
+.topbar{
+  position:sticky;
+  top:0;
+  z-index:1000;
+  display:flex;
+  gap:8px;
+  padding:10px;
+  background:rgba(10,10,15,.85);
+  backdrop-filter:blur(6px);
+}
+.topbar button{
+  flex:1;
+  padding:10px;
+  border-radius:10px;
+  border:none;
+  font-weight:700;
+  color:#fff;
+  background:linear-gradient(135deg,#5b7cfa,#8f5bfa);
 }
 
-.topbar button {
-  flex: 1;
-  padding: 10px;
-  border-radius: 10px;
-  border: none;
-  cursor: pointer;
-  font-weight: 700;
-  color: #fff;
-  background: linear-gradient(135deg,#5b7cfa,#8f5bfa);
+/* MAIN */
+#tierlist{
+  padding:12px;
+  position:relative;
 }
 
-.topbar button.secondary {
-  background: linear-gradient(135deg,#2b2b38,#3a3a4a);
+/* TIERS */
+.tier{display:flex;margin-bottom:6px}
+.tier-label{
+  width:140px;
+  font-weight:800;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:10px 0 0 10px;
+}
+.tier-content{
+  flex:1;
+  min-height:64px;
+  display:flex;
+  flex-wrap:wrap;
+  gap:4px;
+  padding:4px;
+  background:rgba(20,20,30,.9);
+  border-radius:0 10px 10px 0;
 }
 
-/* ===== MAIN ===== */
-#tierlist {
-  padding: 12px;
-  position: relative;
+/* COLORS */
+.imba{background:#ff4d4d}
+.strong{background:#ff944d}
+.good{background:#ffd24d;color:#000}
+.medium{background:#7bed9f;color:#000}
+.weak{background:#70a1ff}
+
+/* POOL */
+.pool{margin-top:12px;border:2px dashed rgba(255,255,255,.2)}
+
+/* BRAWLER */
+.brawler{
+  width:56px;
+  height:56px;
+  border-radius:8px;
+  overflow:hidden;
+  cursor:grab;
+  position:relative;
+  touch-action:none;
+}
+.brawler img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  pointer-events:none;
+  -webkit-touch-callout:none;
+  user-select:none;
+}
+.brawler.dragging{
+  opacity:.7;
+  transform:scale(1.15);
+  z-index:1000;
 }
 
-/* ===== TIERS ===== */
-.tier {
-  display: flex;
-  margin-bottom: 6px;
+/* INFO */
+.info{
+  position:absolute;
+  inset:0;
+  display:none;
+  background:rgba(0,0,0,.85);
+  font-size:11px;
+  align-items:center;
+  justify-content:center;
 }
+.brawler.show .info{display:flex}
 
-.tier-label {
-  width: 140px;
-  font-weight: 800;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 10px 0 0 10px;
+/* CREDIT */
+#credit{
+  position:absolute;
+  top:10px;
+  right:14px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:10px 14px;
+  border-radius:12px;
+  background:rgba(15,15,25,.7);
+  backdrop-filter:blur(10px);
+  border:1px solid rgba(255,255,255,.25);
+  pointer-events:none;
 }
-
-.tier-content {
-  flex: 1;
-  min-height: 64px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
-  padding: 4px;
-  background: rgba(20,20,30,0.9);
-  border-radius: 0 10px 10px 0;
+.credit-name{
+  font-size:18px;
+  font-weight:900;
+  background:linear-gradient(135deg,#9bb4ff,#d79bff,#9bffef);
+  background-size:300% 300%;
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  animation:glow 3s infinite;
 }
-
-/* ===== BRAWLER ===== */
-.brawler {
-  width: 56px;
-  height: 56px;
-  border-radius: 8px;
-  overflow: hidden;
-  cursor: grab;
-  position: relative;
-}
-
-.brawler img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.info {
-  position: absolute;
-  inset: 0;
-  display: none;
-  background: rgba(0,0,0,0.85);
-  font-size: 11px;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-}
-
-.brawler.show .info { display: flex; }
-
-/* ===== COLORS ===== */
-.imba { background:#ff4d4d; }
-.strong { background:#ff944d; }
-.good { background:#ffd24d; color:#000; }
-.medium { background:#7bed9f; color:#000; }
-.weak { background:#70a1ff; }
-
-/* ===== POOL ===== */
-.pool {
-  margin-top: 12px;
-  border: 2px dashed rgba(255,255,255,0.2);
-}
-
-/* ===== LAPIZXX PREMIUM CREDIT ===== */
-#credit {
-  position: absolute;
-  right: 18px;
-  bottom: 16px;
-
-  display: flex;
-  align-items: center;
-  gap: 10px;
-
-  padding: 12px 18px;
-  border-radius: 16px;
-
-  background:
-    linear-gradient(135deg, rgba(120,140,255,0.35), rgba(200,120,255,0.35)),
-    rgba(10,10,18,0.92);
-
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255,255,255,0.25);
-
-  box-shadow:
-    0 0 35px rgba(150,120,255,0.8),
-    0 0 60px rgba(120,200,255,0.5),
-    inset 0 0 18px rgba(255,255,255,0.12);
-
-  pointer-events: none;
-  z-index: 999;
-}
-
-.credit-glow {
-  font-size: 11px;
-  letter-spacing: 0.28em;
-  text-transform: uppercase;
-  color: rgba(255,255,255,0.65);
-}
-
-.credit-name {
-  font-size: 22px;
-  font-weight: 900;
-  letter-spacing: 0.06em;
-
-  background: linear-gradient(135deg, #9bb4ff, #d79bff, #9bffef);
-  background-size: 300% 300%;
-
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-
-  animation: lapizGlow 3s ease-in-out infinite;
-
-  text-shadow:
-    0 0 14px rgba(160,120,255,1),
-    0 0 30px rgba(120,180,255,0.85);
-}
-
-@keyframes lapizGlow {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
-
-@media (max-width:600px){
-  .tier-label{width:100px;font-size:12px}
+@keyframes glow{
+  0%{background-position:0% 50%}
+  50%{background-position:100% 50%}
+  100%{background-position:0% 50%}
 }
 </style>
 </head>
@@ -192,48 +150,21 @@ body {
 
 <div class="topbar">
   <button onclick="exportJSON()">Экспорт JSON</button>
-  <button onclick="importJSON()" class="secondary">Импорт JSON</button>
+  <button onclick="importJSON()">Импорт JSON</button>
   <button onclick="downloadImage()">Скачать PNG</button>
 </div>
 
 <div id="tierlist">
 
-  <div class="tier">
-    <div class="tier-label imba">ИМБА</div>
-    <div class="tier-content" data-tier="imba"></div>
-  </div>
+<div class="tier"><div class="tier-label imba">ИМБА</div><div class="tier-content" data-tier="imba"></div></div>
+<div class="tier"><div class="tier-label strong">ОЧЕНЬ СИЛЬНЫЕ</div><div class="tier-content" data-tier="strong"></div></div>
+<div class="tier"><div class="tier-label good">ХОРОШИЕ</div><div class="tier-content" data-tier="good"></div></div>
+<div class="tier"><div class="tier-label medium">СРЕДНИЕ</div><div class="tier-content" data-tier="medium"></div></div>
+<div class="tier"><div class="tier-label weak">СЛАБЫЕ</div><div class="tier-content" data-tier="weak"></div></div>
 
-  <div class="tier">
-    <div class="tier-label strong">ОЧЕНЬ СИЛЬНЫЕ</div>
-    <div class="tier-content" data-tier="strong"></div>
-  </div>
+<div class="tier pool"><div class="tier-label">ВСЕ</div><div class="tier-content" id="pool" data-tier="pool"></div></div>
 
-  <div class="tier">
-    <div class="tier-label good">ХОРОШИЕ</div>
-    <div class="tier-content" data-tier="good"></div>
-  </div>
-
-  <div class="tier">
-    <div class="tier-label medium">СРЕДНИЕ</div>
-    <div class="tier-content" data-tier="medium"></div>
-  </div>
-
-  <div class="tier">
-    <div class="tier-label weak">СЛАБЫЕ</div>
-    <div class="tier-content" data-tier="weak"></div>
-  </div>
-
-  <div class="tier pool">
-    <div class="tier-label">ВСЕ</div>
-    <div class="tier-content" id="pool" data-tier="pool"></div>
-  </div>
-
-  <!-- CREDIT -->
-  <div id="credit">
-    <span class="credit-glow">Автор</span>
-    <span class="credit-name">Lapizxx</span>
-  </div>
-
+<div id="credit"><span class="credit-name">Lapizxx</span></div>
 </div>
 
 <script>
@@ -244,37 +175,37 @@ const IMG_SUFFIX='_portrait.png';
 const brawlers=[
 '8bit','amber','angelo','ash','barley','bea','belle','berry','bibi','bo','bonnie','brock',
 'bull','buster','buzz','byron','carl','charlie','chester','chuck','clancy','colette',
-'cordelius','crow','darryl','doug','draco','edgar','elprimo','emz','eve',
-'finx','fang','frank','gale','gene','gray','griff','grom','gus','hank','hyper_colt',
-'hyper_dynamike','jacky','Jae-Yong','janet','jessie','juju','Kaze','kenji','kit',
-'larry&lawrie','leon','lily','lola','lou','lumi','maisie','mandy','max','meeple','meg',
-'melodie','mico','Mina','moe','mortis','mrp','nani','nita','ollie','otis','pam','pearl',
-'penny','piper','poco','rico','rosa','rt','ruffs','sam','sandy','shade','Shelly','spike',
-'sprout','squeak','stu','surge','tara','tick','trunk','willow','ziggi'
-].map(id=>({id,name:id}));
+'cordelius','crow','darryl','doug','draco','edgar','elprimo','emz','eve','fang','frank',
+'gale','gene','gray','griff','grom','gus','hank','hyper_colt','hyper_dynamike','jacky',
+'jae-yong','janet','jessie','juju','kaze','kenji','kit','larrylawrie','leon','lily','lola',
+'lou','lumi','maisie','mandy','max','meeple','meg','melodie','mico','mina','moe','mortis',
+'mrp','nani','nita','ollie','otis','pam','pearl','penny','piper','poco','rico','rosa','rt',
+'ruffs','sam','sandy','shade','shelly','spike','sprout','squeak','stu','surge','tara','tick',
+'trunk','willow','ziggi'
+];
 
 let saved=JSON.parse(localStorage.getItem(STORAGE_KEY)||'{}');
 
 function render(){
   document.querySelectorAll('.tier-content').forEach(z=>z.innerHTML='');
-  brawlers.forEach(b=>{
+  brawlers.forEach(id=>{
     const el=document.createElement('div');
     el.className='brawler';
-    el.id=b.id;
-    el.draggable=true;
-    el.innerHTML=`<img src="${IMG_PATH+b.id+IMG_SUFFIX}">
-                  <div class="info">${b.id}</div>`;
+    el.id=id;
+    el.innerHTML=`<img src="${IMG_PATH+id+IMG_SUFFIX}"><div class="info">${id}</div>`;
     el.onclick=()=>el.classList.toggle('show');
-    el.ondragstart=e=>e.dataTransfer.setData('id',b.id);
-    const tier=saved[b.id]||'pool';
+    el.draggable=true;
+    el.ondragstart=e=>e.dataTransfer.setData('id',id);
+    const tier=saved[id]||'pool';
     document.querySelector(`[data-tier="${tier}"]`).appendChild(el);
   });
 }
+render();
 
+/* DESKTOP DROP */
 document.querySelectorAll('.tier-content').forEach(zone=>{
   zone.ondragover=e=>e.preventDefault();
   zone.ondrop=e=>{
-    e.preventDefault();
     const id=e.dataTransfer.getData('id');
     saved[id]=zone.dataset.tier;
     localStorage.setItem(STORAGE_KEY,JSON.stringify(saved));
@@ -282,14 +213,43 @@ document.querySelectorAll('.tier-content').forEach(zone=>{
   };
 });
 
+/* ANDROID TOUCH DRAG */
+let touchItem=null;
+
+document.addEventListener('touchstart',e=>{
+  const b=e.target.closest('.brawler');
+  if(!b)return;
+  touchItem=b;
+  b.classList.add('dragging');
+},{passive:true});
+
+document.addEventListener('touchmove',e=>{
+  if(!touchItem)return;
+  e.preventDefault();
+  const t=e.touches[0];
+  const el=document.elementFromPoint(t.clientX,t.clientY);
+  const zone=el?.closest('.tier-content');
+  if(zone)zone.appendChild(touchItem);
+},{passive:false});
+
+document.addEventListener('touchend',()=>{
+  if(!touchItem)return;
+  const zone=touchItem.parentElement;
+  if(zone?.dataset?.tier){
+    saved[touchItem.id]=zone.dataset.tier;
+    localStorage.setItem(STORAGE_KEY,JSON.stringify(saved));
+  }
+  touchItem.classList.remove('dragging');
+  touchItem=null;
+});
+
+/* JSON */
 function exportJSON(){
-  const blob=new Blob([JSON.stringify(saved,null,2)],{type:'application/json'});
   const a=document.createElement('a');
-  a.href=URL.createObjectURL(blob);
+  a.href=URL.createObjectURL(new Blob([JSON.stringify(saved,null,2)]));
   a.download='tierlist.json';
   a.click();
 }
-
 function importJSON(){
   const i=document.createElement('input');
   i.type='file';i.accept='.json';
@@ -301,23 +261,16 @@ function importJSON(){
   i.click();
 }
 
+/* PNG */
 function downloadImage(){
   html2canvas(document.getElementById('tierlist'),{backgroundColor:null})
-    .then(c=>{
-      const a=document.createElement('a');
-      a.href=c.toDataURL();
-      a.download='tierlist.png';
-      a.click();
-    });
+  .then(c=>{
+    const a=document.createElement('a');
+    a.href=c.toDataURL();
+    a.download='tierlist.png';
+    a.click();
+  });
 }
-
-render();
 </script>
-<script src="credit.js"></script>
-
 </body>
 </html>
-
-
-
-
