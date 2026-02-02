@@ -19,7 +19,10 @@ html,body{margin:0;font-family:system-ui,Arial,sans-serif;color:#fff}
     radial-gradient(900px 500px at 100% 0%, #1d4b5a, transparent 60%),
     linear-gradient(180deg,#0c0c10,#09090d);
 }
-#particles{position:fixed;inset:0;z-index:-1}
+#particles{
+  position:fixed;inset:0;z-index:-1;
+  pointer-events:none; /* 🔥 КРИТИЧНО */
+}
 
 /* ===== TOP BAR ===== */
 .topbar{
@@ -75,6 +78,7 @@ html,body{margin:0;font-family:system-ui,Arial,sans-serif;color:#fff}
 .pool{
   margin-top:12px;
   margin-bottom:calc(20px + env(safe-area-inset-bottom));
+  border:none;
 }
 
 /* ===== CREDIT ===== */
@@ -135,16 +139,108 @@ html,body{margin:0;font-family:system-ui,Arial,sans-serif;color:#fff}
 const STORAGE_KEY='bs-tierlist';
 const IMG_PATH='brawlers/';
 
+/* 🔥 ЯВНЫЙ СПИСОК, БЕЗ ИЗМЕНЕНИЯ ИМЁН ФАЙЛОВ */
 const brawlers = [
-  'GIGI','PIERCE','Glouber','8bit','alli','amber','angelo','ash','barley','bea','belle','berry','bibi','bo',
-  'bonnie','brock','bull','buster','buzz','buzz_lightyear','byron','carl','charlie','chester','chuck','clancy',
-  'colette','cordelius','crow','darryl','doug','draco','edgar','elprimo','emz','eve','fang','finx','frank','gale',
-  'gene','gray','griff','grom','gus','hank','hyper_colt','hyper_dynamike','jacky','Jae-Yong','janet','jessie',
-  'juju','Kaze','kenji','kit','larry&lawrie','leon','lily','lola','lou','lumi','maisie','mandy','max','meeple',
-  'meg','melodie','mico','Mina','moe','mortis','mrp','nani','nita','ollie','otis','pam','pearl','penny','piper',
-  'poco','rico','rosa','rt','ruffs','sam','sandy','shade','Shelly','spike','sprout','squeak','stu','surge',
-  'tara','tick','trunk','willow','ziggi'
-].map(n=>({id:n.toLowerCase(),file:`${n}_portrait.png`}));
+  {id:'gigi',file:'GIGI_portrait.png'},
+  {id:'pierce',file:'PIERCE_portrait.png'},
+  {id:'glouber',file:'Glouber_portrait.PNG'},
+  {id:'8bit',file:'8bit_portrait.png'},
+  {id:'alli',file:'alli_portrait.png'},
+  {id:'amber',file:'amber_portrait.png'},
+  {id:'angelo',file:'angelo_portrait.png'},
+  {id:'ash',file:'ash_portrait.png'},
+  {id:'barley',file:'barley_portrait.png'},
+  {id:'bea',file:'bea_portrait.png'},
+  {id:'belle',file:'belle_portrait.png'},
+  {id:'berry',file:'berry_portrait.png'},
+  {id:'bibi',file:'bibi_portrait.png'},
+  {id:'bo',file:'bo_portrait.png'},
+  {id:'bonnie',file:'bonnie_portrait.png'},
+  {id:'brock',file:'brock_portrait.png'},
+  {id:'bull',file:'bull_portrait.png'},
+  {id:'buster',file:'buster_portrait.png'},
+  {id:'buzz',file:'buzz_portrait.png'},
+  {id:'byron',file:'byron_portrait.png'},
+  {id:'carl',file:'carl_portrait.png'},
+  {id:'charlie',file:'charlie_portrait.png'},
+  {id:'chester',file:'chester_portrait.png'},
+  {id:'chuck',file:'chuck_portrait.png'},
+  {id:'clancy',file:'clancy_portrait.png'},
+  {id:'colette',file:'colette_portrait.png'},
+  {id:'cordelius',file:'cordelius_portrait.png'},
+  {id:'crow',file:'crow_portrait.png'},
+  {id:'darryl',file:'darryl_portrait.png'},
+  {id:'doug',file:'doug_portrait.png'},
+  {id:'draco',file:'draco_portrait.png'},
+  {id:'edgar',file:'edgar_portrait.png'},
+  {id:'elprimo',file:'elprimo_portrait.png'},
+  {id:'emz',file:'emz_portrait.png'},
+  {id:'eve',file:'eve_portrait.png'},
+  {id:'fang',file:'fang_portrait.png'},
+  {id:'finx',file:'finx_portrait.png'},
+  {id:'frank',file:'frank_portrait.png'},
+  {id:'gale',file:'gale_portrait.png'},
+  {id:'gene',file:'gene_portrait.png'},
+  {id:'gray',file:'gray_portrait.png'},
+  {id:'griff',file:'griff_portrait.png'},
+  {id:'grom',file:'grom_portrait.png'},
+  {id:'gus',file:'gus_portrait.png'},
+  {id:'hank',file:'hank_portrait.png'},
+  {id:'hyper_colt',file:'hyper_colt_portrait.png'},
+  {id:'hyper_dynamike',file:'hyper_dynamike_portrait.png'},
+  {id:'jacky',file:'jacky_portrait.png'},
+  {id:'Jae-Yong',file:'Jae-Yong_portrait.png'},
+  {id:'janet',file:'janet_portrait.png'},
+  {id:'jessie',file:'jessie_portrait.png'},
+  {id:'juju',file:'juju_portrait.png'},
+  {id:'kaze',file:'Kaze_portrait.png'},
+  {id:'kenji',file:'kenji_portrait.png'},
+  {id:'kit',file:'kit_portrait.png'},
+  {id:'larry&lawrie',file:'larry&lawrie_portrait.png'},
+  {id:'leon',file:'leon_portrait.png'},
+  {id:'lily',file:'lily_portrait.png'},
+  {id:'lola',file:'lola_portrait.png'},
+  {id:'lou',file:'lou_portrait.png'},
+  {id:'lumi',file:'lumi_portrait.png'},
+  {id:'maisie',file:'maisie_portrait.png'},
+  {id:'mandy',file:'mandy_portrait.png'},
+  {id:'max',file:'max_portrait.png'},
+  {id:'meeple',file:'meeple_portrait.png'},
+  {id:'meg',file:'meg_portrait.png'},
+  {id:'melodie',file:'melodie_portrait.png'},
+  {id:'mico',file:'mico_portrait.png'},
+  {id:'Mina',file:'Mina_portrait.png'},
+  {id:'moe',file:'moe_portrait.png'},
+  {id:'mortis',file:'mortis_portrait.png'},
+  {id:'mrp',file:'mrp_portrait.png'},
+  {id:'nani',file:'nani_portrait.png'},
+  {id:'nita',file:'nita_portrait.png'},
+  {id:'ollie',file:'ollie_portrait.png'},
+  {id:'otis',file:'otis_portrait.png'},
+  {id:'pam',file:'pam_portrait.png'},
+  {id:'pearl',file:'pearl_portrait.png'},
+  {id:'penny',file:'penny_portrait.png'},
+  {id:'piper',file:'piper_portrait.png'},
+  {id:'poco',file:'poco_portrait.png'},
+  {id:'rico',file:'rico_portrait.png'},
+  {id:'rosa',file:'rosa_portrait.png'},
+  {id:'rt',file:'rt_portrait.png'},
+  {id:'ruffs',file:'ruffs_portrait.png'},
+  {id:'sam',file:'sam_portrait.png'},
+  {id:'sandy',file:'sandy_portrait.png'},
+  {id:'shade',file:'shade_portrait.png'},
+  {id:'Shelly',file:'Shelly_portrait.png'},
+  {id:'spike',file:'spike_portrait.png'},
+  {id:'sprout',file:'sprout_portrait.png'},
+  {id:'squeak',file:'squeak_portrait.png'},
+  {id:'stu',file:'stu_portrait.png'},
+  {id:'surge',file:'surge_portrait.png'},
+  {id:'tara',file:'tara_portrait.png'},
+  {id:'tick',file:'tick_portrait.png'},
+  {id:'trunk',file:'trunk_portrait.png'},
+  {id:'willow',file:'willow_portrait.png'},
+  {id:'ziggi',file:'ziggi_portrait.png'}
+];
 
 let saved=JSON.parse(localStorage.getItem(STORAGE_KEY)||'{}');
 let touchItem=null;
