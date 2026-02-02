@@ -37,7 +37,7 @@ html,body{margin:0;font-family:system-ui,Arial,sans-serif;color:#fff}
 /* ===== MAIN ===== */
 #tierlist{
   padding:12px;
-  padding-bottom:calc(16px + env(safe-area-inset-bottom));
+  padding-bottom:calc(20px + env(safe-area-inset-bottom));
 }
 
 /* ===== TIERS ===== */
@@ -60,15 +60,21 @@ html,body{margin:0;font-family:system-ui,Arial,sans-serif;color:#fff}
 .weak{background:#70a1ff}
 
 /* ===== BRAWLER ===== */
-.brawler{width:56px;height:56px;border-radius:8px;overflow:hidden}
+.brawler{
+  width:56px;height:56px;border-radius:8px;
+  overflow:hidden;touch-action:none;
+}
 .brawler img{width:100%;height:100%;object-fit:cover}
-.brawler.dragging{position:fixed;z-index:9999;pointer-events:none}
+.brawler.dragging{
+  position:fixed;z-index:9999;
+  pointer-events:none;
+  transform:scale(1.05);
+}
 
-/* ===== POOL ===== */
+/* ===== POOL (БЕЗ БАЗЛАЙТЕРА) ===== */
 .pool{
   margin-top:12px;
-  border:2px dashed rgba(255,255,255,.2);
-  margin-bottom:calc(24px + env(safe-area-inset-bottom));
+  margin-bottom:calc(20px + env(safe-area-inset-bottom));
 }
 
 /* ===== CREDIT ===== */
@@ -129,111 +135,16 @@ html,body{margin:0;font-family:system-ui,Arial,sans-serif;color:#fff}
 const STORAGE_KEY='bs-tierlist';
 const IMG_PATH='brawlers/';
 
-const brawlers=[
-  // 🔴 СПЕЦИАЛЬНЫЕ
-  {id:'gigi',file:'GIGI_portrait.png'},
-  {id:'pierce',file:'PIERCE_portrait.png'},
-  {id:'glouber',file:'Glouber_portrait.PNG'},
-
-  // 🟢 ОСНОВНЫЕ (99 всего)
-  {id:'8bit',file:'8bit_portrait.png'},
-  {id:'alli',file:'alli_portrait.png'},
-  {id:'amber',file:'amber_portrait.png'},
-  {id:'angelo',file:'angelo_portrait.png'},
-  {id:'ash',file:'ash_portrait.png'},
-  {id:'barley',file:'barley_portrait.png'},
-  {id:'bea',file:'bea_portrait.png'},
-  {id:'belle',file:'belle_portrait.png'},
-  {id:'berry',file:'berry_portrait.png'},
-  {id:'bibi',file:'bibi_portrait.png'},
-  {id:'bo',file:'bo_portrait.png'},
-  {id:'bonnie',file:'bonnie_portrait.png'},
-  {id:'brock',file:'brock_portrait.png'},
-  {id:'bull',file:'bull_portrait.png'},
-  {id:'buster',file:'buster_portrait.png'},
-  {id:'buzz',file:'buzz_portrait.png'},
-  {id:'buzz_lightyear',file:'buzz_lightyear_portrait.png'},
-  {id:'byron',file:'byron_portrait.png'},
-  {id:'carl',file:'carl_portrait.png'},
-  {id:'charlie',file:'charlie_portrait.png'},
-  {id:'chester',file:'chester_portrait.png'},
-  {id:'chuck',file:'chuck_portrait.png'},
-  {id:'clancy',file:'clancy_portrait.png'},
-  {id:'colette',file:'colette_portrait.png'},
-  {id:'cordelius',file:'cordelius_portrait.png'},
-  {id:'crow',file:'crow_portrait.png'},
-  {id:'darryl',file:'darryl_portrait.png'},
-  {id:'doug',file:'doug_portrait.png'},
-  {id:'draco',file:'draco_portrait.png'},
-  {id:'edgar',file:'edgar_portrait.png'},
-  {id:'elprimo',file:'elprimo_portrait.png'},
-  {id:'emz',file:'emz_portrait.png'},
-  {id:'eve',file:'eve_portrait.png'},
-  {id:'fang',file:'fang_portrait.png'},
-  {id:'finx',file:'finx_portrait.png'},
-  {id:'frank',file:'frank_portrait.png'},
-  {id:'gale',file:'gale_portrait.png'},
-  {id:'gene',file:'gene_portrait.png'},
-  {id:'gray',file:'gray_portrait.png'},
-  {id:'griff',file:'griff_portrait.png'},
-  {id:'grom',file:'grom_portrait.png'},
-  {id:'gus',file:'gus_portrait.png'},
-  {id:'hank',file:'hank_portrait.png'},
-  {id:'hyper_colt',file:'hyper_colt_portrait.png'},
-  {id:'hyper_dynamike',file:'hyper_dynamike_portrait.png'},
-  {id:'jacky',file:'jacky_portrait.png'},
-  {id:'Jae-Yong',file:'Jae-Yong_portrait.png'},
-  {id:'janet',file:'janet_portrait.png'},
-  {id:'jessie',file:'jessie_portrait.png'},
-  {id:'juju',file:'juju_portrait.png'},
-  {id:'kaze',file:'Kaze_portrait.png'},
-  {id:'kenji',file:'kenji_portrait.png'},
-  {id:'kit',file:'kit_portrait.png'},
-  {id:'larry&lawrie',file:'larry&lawrie_portrait.png'},
-  {id:'leon',file:'leon_portrait.png'},
-  {id:'lily',file:'lily_portrait.png'},
-  {id:'lola',file:'lola_portrait.png'},
-  {id:'lou',file:'lou_portrait.png'},
-  {id:'lumi',file:'lumi_portrait.png'},
-  {id:'maisie',file:'maisie_portrait.png'},
-  {id:'mandy',file:'mandy_portrait.png'},
-  {id:'max',file:'max_portrait.png'},
-  {id:'meeple',file:'meeple_portrait.png'},
-  {id:'meg',file:'meg_portrait.png'},
-  {id:'melodie',file:'melodie_portrait.png'},
-  {id:'mico',file:'mico_portrait.png'},
-  {id:'Mina',file:'Mina_portrait.png'},
-  {id:'moe',file:'moe_portrait.png'},
-  {id:'mortis',file:'mortis_portrait.png'},
-  {id:'mrp',file:'mrp_portrait.png'},
-  {id:'nani',file:'nani_portrait.png'},
-  {id:'nita',file:'nita_portrait.png'},
-  {id:'ollie',file:'ollie_portrait.png'},
-  {id:'otis',file:'otis_portrait.png'},
-  {id:'pam',file:'pam_portrait.png'},
-  {id:'pearl',file:'pearl_portrait.png'},
-  {id:'penny',file:'penny_portrait.png'},
-  {id:'piper',file:'piper_portrait.png'},
-  {id:'poco',file:'poco_portrait.png'},
-  {id:'rico',file:'rico_portrait.png'},
-  {id:'rosa',file:'rosa_portrait.png'},
-  {id:'rt',file:'rt_portrait.png'},
-  {id:'ruffs',file:'ruffs_portrait.png'},
-  {id:'sam',file:'sam_portrait.png'},
-  {id:'sandy',file:'sandy_portrait.png'},
-  {id:'shade',file:'shade_portrait.png'},
-  {id:'Shelly',file:'Shelly_portrait.png'},
-  {id:'spike',file:'spike_portrait.png'},
-  {id:'sprout',file:'sprout_portrait.png'},
-  {id:'squeak',file:'squeak_portrait.png'},
-  {id:'stu',file:'stu_portrait.png'},
-  {id:'surge',file:'surge_portrait.png'},
-  {id:'tara',file:'tara_portrait.png'},
-  {id:'tick',file:'tick_portrait.png'},
-  {id:'trunk',file:'trunk_portrait.png'},
-  {id:'willow',file:'willow_portrait.png'},
-  {id:'ziggi',file:'ziggi_portrait.png'}
-];
+const brawlers = [
+  'GIGI','PIERCE','Glouber','8bit','alli','amber','angelo','ash','barley','bea','belle','berry','bibi','bo',
+  'bonnie','brock','bull','buster','buzz','buzz_lightyear','byron','carl','charlie','chester','chuck','clancy',
+  'colette','cordelius','crow','darryl','doug','draco','edgar','elprimo','emz','eve','fang','finx','frank','gale',
+  'gene','gray','griff','grom','gus','hank','hyper_colt','hyper_dynamike','jacky','Jae-Yong','janet','jessie',
+  'juju','Kaze','kenji','kit','larry&lawrie','leon','lily','lola','lou','lumi','maisie','mandy','max','meeple',
+  'meg','melodie','mico','Mina','moe','mortis','mrp','nani','nita','ollie','otis','pam','pearl','penny','piper',
+  'poco','rico','rosa','rt','ruffs','sam','sandy','shade','Shelly','spike','sprout','squeak','stu','surge',
+  'tara','tick','trunk','willow','ziggi'
+].map(n=>({id:n.toLowerCase(),file:`${n}_portrait.png`}));
 
 let saved=JSON.parse(localStorage.getItem(STORAGE_KEY)||'{}');
 let touchItem=null;
@@ -245,34 +156,30 @@ function render(){
     const el=document.createElement('div');
     el.className='brawler';
     el.innerHTML=`<img src="${IMG_PATH+b.file}">`;
-    el.addEventListener('touchstart',e=>{
-      e.preventDefault();
-      touchItem=el;
-      el.classList.add('dragging');
-    });
+    el.addEventListener('touchstart',()=>{touchItem=el;el.classList.add('dragging')});
     const tier=saved[b.id]||'pool';
     document.querySelector(`[data-tier="${tier}"]`).appendChild(el);
   });
 }
 
-/* ================= TOUCH ================= */
+/* ================= TOUCH DRAG ================= */
 document.addEventListener('touchmove',e=>{
-  if(!touchItem)return;
+  if(!touchItem) return;
   e.preventDefault();
   const t=e.touches[0];
   touchItem.style.left=(t.clientX-28)+'px';
-  touchItem.style.top =(t.clientY-28)+'px';
+  touchItem.style.top=(t.clientY-28)+'px';
   const el=document.elementFromPoint(t.clientX,t.clientY);
   const zone=el?.closest('.tier-content');
   if(zone){
-    const file=touchItem.querySelector('img').src.split('/').pop();
-    const b=brawlers.find(x=>x.file===file);
+    const img=touchItem.querySelector('img').src.split('/').pop();
+    const b=brawlers.find(x=>x.file===img);
     if(b) saved[b.id]=zone.dataset.tier;
   }
 },{passive:false});
 
 document.addEventListener('touchend',()=>{
-  if(!touchItem)return;
+  if(!touchItem) return;
   touchItem.classList.remove('dragging');
   touchItem.style.left='';
   touchItem.style.top='';
@@ -284,13 +191,9 @@ document.addEventListener('touchend',()=>{
 /* ================= PNG ================= */
 function downloadImage(){
   html2canvas(document.getElementById('tierlist'),{backgroundColor:null,useCORS:true})
-  .then(canvas=>{
-    const url=canvas.toDataURL('image/png');
-    const old=document.getElementById('png-preview');
-    if(old)old.remove();
+  .then(c=>{
     const img=document.createElement('img');
-    img.id='png-preview';
-    img.src=url;
+    img.src=c.toDataURL('image/png');
     img.style.position='fixed';
     img.style.inset='0';
     img.style.margin='auto';
@@ -317,30 +220,24 @@ function importJSON(){
   i.type='file';i.accept='.json';
   i.onchange=e=>{
     const r=new FileReader();
-    r.onload=()=>{
-      saved=JSON.parse(r.result);
-      localStorage.setItem(STORAGE_KEY,JSON.stringify(saved));
-      render();
-    };
+    r.onload=()=>{saved=JSON.parse(r.result);localStorage.setItem(STORAGE_KEY,JSON.stringify(saved));render()};
     r.readAsText(e.target.files[0]);
   };
   i.click();
 }
 
 /* ================= PARTICLES ================= */
-const c=document.getElementById('particles');
-const ctx=c.getContext('2d');
+const c=document.getElementById('particles'),ctx=c.getContext('2d');
 let W,H,parts=[];
 function resize(){W=c.width=innerWidth;H=c.height=innerHeight}
 resize();addEventListener('resize',resize);
-for(let i=0;i<70;i++)parts.push({x:Math.random()*W,y:Math.random()*H,r:Math.random()*2+1,v:Math.random()*0.3+0.1});
+for(let i=0;i<70;i++)parts.push({x:Math.random()*W,y:Math.random()*H,r:Math.random()*2+1,v:Math.random()*.3+.1});
 (function loop(){
   ctx.clearRect(0,0,W,H);
   ctx.fillStyle='rgba(180,160,255,.35)';
   parts.forEach(p=>{p.y-=p.v;if(p.y<0)p.y=H;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fill()});
   requestAnimationFrame(loop);
 })();
-
 render();
 </script>
 </body>
