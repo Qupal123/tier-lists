@@ -19,10 +19,7 @@ html,body{margin:0;font-family:system-ui,Arial,sans-serif;color:#fff}
     radial-gradient(900px 500px at 100% 0%, #1d4b5a, transparent 60%),
     linear-gradient(180deg,#0c0c10,#09090d);
 }
-#particles{
-  position:fixed;inset:0;z-index:-1;
-  pointer-events:none; /* 🔥 КРИТИЧНО */
-}
+#particles{position:fixed;inset:0;z-index:-1}
 
 /* ===== TOP BAR ===== */
 .topbar{
@@ -40,7 +37,7 @@ html,body{margin:0;font-family:system-ui,Arial,sans-serif;color:#fff}
 /* ===== MAIN ===== */
 #tierlist{
   padding:12px;
-  padding-bottom:calc(20px + env(safe-area-inset-bottom));
+  padding-bottom:calc(16px + env(safe-area-inset-bottom));
 }
 
 /* ===== TIERS ===== */
@@ -64,27 +61,33 @@ html,body{margin:0;font-family:system-ui,Arial,sans-serif;color:#fff}
 
 /* ===== BRAWLER ===== */
 .brawler{
-  width:56px;height:56px;border-radius:8px;
-  overflow:hidden;touch-action:none;
+  width:56px;height:56px;
+  border-radius:8px;
+  overflow:hidden;
+  cursor:grab;
 }
 .brawler img{width:100%;height:100%;object-fit:cover}
 .brawler.dragging{
-  position:fixed;z-index:9999;
+  position:fixed;
+  z-index:9999;
   pointer-events:none;
-  transform:scale(1.05);
+  cursor:grabbing;
 }
 
-/* ===== POOL (БЕЗ БАЗЛАЙТЕРА) ===== */
+/* ===== POOL ===== */
 .pool{
   margin-top:12px;
-  margin-bottom:calc(20px + env(safe-area-inset-bottom));
-  border:none;
+  border:2px dashed rgba(255,255,255,.2);
+  margin-bottom:calc(24px + env(safe-area-inset-bottom));
 }
 
 /* ===== CREDIT ===== */
 #credit{
-  position:fixed;right:14px;top:14px;
-  padding:10px 16px;border-radius:16px;
+  position:fixed;
+  right:14px;
+  top:14px;
+  padding:10px 16px;
+  border-radius:16px;
   pointer-events:none;
   background:
     linear-gradient(135deg,rgba(120,140,255,.35),rgba(200,120,255,.35)),
@@ -93,7 +96,8 @@ html,body{margin:0;font-family:system-ui,Arial,sans-serif;color:#fff}
   box-shadow:0 0 30px rgba(150,120,255,.9);
 }
 #credit span{
-  font-size:18px;font-weight:900;
+  font-size:18px;
+  font-weight:900;
   background:linear-gradient(135deg,#9bb4ff,#d79bff,#9bffef);
   background-size:300% 300%;
   -webkit-background-clip:text;
@@ -120,6 +124,7 @@ html,body{margin:0;font-family:system-ui,Arial,sans-serif;color:#fff}
 </div>
 
 <div id="tierlist">
+
   <div class="tier"><div class="tier-label imba">ИМБА</div><div class="tier-content" data-tier="imba"></div></div>
   <div class="tier"><div class="tier-label strong">ОЧЕНЬ СИЛЬНЫЕ</div><div class="tier-content" data-tier="strong"></div></div>
   <div class="tier"><div class="tier-label good">ХОРОШИЕ</div><div class="tier-content" data-tier="good"></div></div>
@@ -130,20 +135,21 @@ html,body{margin:0;font-family:system-ui,Arial,sans-serif;color:#fff}
     <div class="tier-label">ВСЕ</div>
     <div class="tier-content" data-tier="pool"></div>
   </div>
+
 </div>
 
 <div id="credit"><span>Lapizxx</span></div>
 
 <script>
-/* ================= DATA ================= */
 const STORAGE_KEY='bs-tierlist';
 const IMG_PATH='brawlers/';
 
-/* 🔥 ЯВНЫЙ СПИСОК, БЕЗ ИЗМЕНЕНИЯ ИМЁН ФАЙЛОВ */
-const brawlers = [
+/* ===== BRAWLERS (Buzz Lightyear УДАЛЁН) ===== */
+const brawlers=[
   {id:'gigi',file:'GIGI_portrait.png'},
   {id:'pierce',file:'PIERCE_portrait.png'},
   {id:'glouber',file:'Glouber_portrait.PNG'},
+
   {id:'8bit',file:'8bit_portrait.png'},
   {id:'alli',file:'alli_portrait.png'},
   {id:'amber',file:'amber_portrait.png'},
@@ -243,67 +249,77 @@ const brawlers = [
 ];
 
 let saved=JSON.parse(localStorage.getItem(STORAGE_KEY)||'{}');
-let touchItem=null;
+let dragItem=null;
 
-/* ================= RENDER ================= */
+/* ===== RENDER ===== */
 function render(){
   document.querySelectorAll('.tier-content').forEach(z=>z.innerHTML='');
   brawlers.forEach(b=>{
     const el=document.createElement('div');
     el.className='brawler';
+    el.dataset.id=b.id;
     el.innerHTML=`<img src="${IMG_PATH+b.file}">`;
-    el.addEventListener('touchstart',()=>{touchItem=el;el.classList.add('dragging')});
+
+    el.draggable=true;
+    el.ondragstart=e=>{
+      dragItem=b.id;
+      e.dataTransfer.setData('text/plain',b.id);
+    };
+
+    el.addEventListener('touchstart',e=>{
+      dragItem=b.id;
+      el.classList.add('dragging');
+    });
+
     const tier=saved[b.id]||'pool';
     document.querySelector(`[data-tier="${tier}"]`).appendChild(el);
   });
 }
 
-/* ================= TOUCH DRAG ================= */
-document.addEventListener('touchmove',e=>{
-  if(!touchItem) return;
-  e.preventDefault();
-  const t=e.touches[0];
-  touchItem.style.left=(t.clientX-28)+'px';
-  touchItem.style.top=(t.clientY-28)+'px';
+document.querySelectorAll('.tier-content').forEach(zone=>{
+  zone.ondragover=e=>e.preventDefault();
+  zone.ondrop=e=>{
+    e.preventDefault();
+    const id=e.dataTransfer.getData('text/plain');
+    saved[id]=zone.dataset.tier;
+    localStorage.setItem(STORAGE_KEY,JSON.stringify(saved));
+    render();
+  };
+});
+
+/* ===== TOUCH DROP ===== */
+document.addEventListener('touchend',e=>{
+  if(!dragItem)return;
+  const t=e.changedTouches[0];
   const el=document.elementFromPoint(t.clientX,t.clientY);
   const zone=el?.closest('.tier-content');
   if(zone){
-    const img=touchItem.querySelector('img').src.split('/').pop();
-    const b=brawlers.find(x=>x.file===img);
-    if(b) saved[b.id]=zone.dataset.tier;
+    saved[dragItem]=zone.dataset.tier;
+    localStorage.setItem(STORAGE_KEY,JSON.stringify(saved));
   }
-},{passive:false});
-
-document.addEventListener('touchend',()=>{
-  if(!touchItem) return;
-  touchItem.classList.remove('dragging');
-  touchItem.style.left='';
-  touchItem.style.top='';
-  localStorage.setItem(STORAGE_KEY,JSON.stringify(saved));
+  document.querySelectorAll('.brawler').forEach(b=>b.classList.remove('dragging'));
+  dragItem=null;
   render();
-  touchItem=null;
 });
 
-/* ================= PNG ================= */
+/* ===== PNG (Tiermaker style) ===== */
 function downloadImage(){
-  html2canvas(document.getElementById('tierlist'),{backgroundColor:null,useCORS:true})
-  .then(c=>{
-    const img=document.createElement('img');
-    img.src=c.toDataURL('image/png');
-    img.style.position='fixed';
-    img.style.inset='0';
-    img.style.margin='auto';
-    img.style.maxWidth='100%';
-    img.style.maxHeight='100%';
-    img.style.zIndex='99999';
-    img.style.background='#000';
-    img.onclick=()=>img.remove();
-    document.body.appendChild(img);
-    alert('Зажми изображение и выбери «Сохранить»');
+  html2canvas(document.getElementById('tierlist'),{backgroundColor:null,scale:2,useCORS:true})
+  .then(canvas=>{
+    canvas.toBlob(blob=>{
+      const url=URL.createObjectURL(blob);
+      const a=document.createElement('a');
+      a.href=url;
+      a.download='tierlist.png';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(()=>URL.revokeObjectURL(url),1000);
+    },'image/png');
   });
 }
 
-/* ================= JSON ================= */
+/* ===== JSON ===== */
 function exportJSON(){
   const b=new Blob([JSON.stringify(saved,null,2)],{type:'application/json'});
   const a=document.createElement('a');
@@ -316,24 +332,33 @@ function importJSON(){
   i.type='file';i.accept='.json';
   i.onchange=e=>{
     const r=new FileReader();
-    r.onload=()=>{saved=JSON.parse(r.result);localStorage.setItem(STORAGE_KEY,JSON.stringify(saved));render()};
+    r.onload=()=>{
+      saved=JSON.parse(r.result);
+      localStorage.setItem(STORAGE_KEY,JSON.stringify(saved));
+      render();
+    };
     r.readAsText(e.target.files[0]);
   };
   i.click();
 }
 
-/* ================= PARTICLES ================= */
-const c=document.getElementById('particles'),ctx=c.getContext('2d');
+/* ===== PARTICLES ===== */
+const c=document.getElementById('particles');
+const ctx=c.getContext('2d');
 let W,H,parts=[];
 function resize(){W=c.width=innerWidth;H=c.height=innerHeight}
 resize();addEventListener('resize',resize);
-for(let i=0;i<70;i++)parts.push({x:Math.random()*W,y:Math.random()*H,r:Math.random()*2+1,v:Math.random()*.3+.1});
+for(let i=0;i<70;i++)parts.push({x:Math.random()*W,y:Math.random()*H,r:Math.random()*2+1,v:Math.random()*0.3+0.1});
 (function loop(){
   ctx.clearRect(0,0,W,H);
   ctx.fillStyle='rgba(180,160,255,.35)';
-  parts.forEach(p=>{p.y-=p.v;if(p.y<0)p.y=H;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fill()});
+  parts.forEach(p=>{
+    p.y-=p.v;if(p.y<0)p.y=H;
+    ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fill();
+  });
   requestAnimationFrame(loop);
 })();
+
 render();
 </script>
 </body>
