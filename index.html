@@ -13,30 +13,45 @@ html,body{margin:0;font-family:system-ui,Arial,sans-serif;color:#fff}
 
 /* ===== BACKGROUND ===== */
 #bg{
-  position:fixed;inset:0;z-index:-2;
+  position:fixed;inset:0;z-index:-3;
   background:
     radial-gradient(900px 500px at 0% 0%, #3b1d5a, transparent 60%),
     radial-gradient(900px 500px at 100% 0%, #1d4b5a, transparent 60%),
     linear-gradient(180deg,#0c0c10,#09090d);
 }
-#particles{position:fixed;inset:0;z-index:-1}
+#particles{
+  position:fixed;
+  inset:0;
+  z-index:-2;
+  pointer-events:none;
+}
 
 /* ===== TOP BAR ===== */
 .topbar{
-  position:sticky;top:0;z-index:1000;
-  display:flex;gap:8px;padding:10px;
+  position:sticky;
+  top:0;
+  z-index:1000;
+  display:flex;
+  gap:8px;
+  padding:10px;
   backdrop-filter:blur(8px);
   background:rgba(10,10,15,.85);
 }
 .topbar button{
-  flex:1;padding:10px;border:none;border-radius:14px;
-  font-weight:700;color:#fff;
+  flex:1;
+  padding:10px;
+  border:none;
+  border-radius:14px;
+  font-weight:700;
+  color:#fff;
+  cursor:pointer;
   background:linear-gradient(135deg,#5b7cfa,#8f5bfa);
 }
 
 /* ===== MAIN ===== */
 #tierlist{
   padding:12px;
+  position:relative;
   padding-bottom:calc(16px + env(safe-area-inset-bottom));
 }
 
@@ -61,15 +76,14 @@ html,body{margin:0;font-family:system-ui,Arial,sans-serif;color:#fff}
 
 /* ===== BRAWLER ===== */
 .brawler{
-  width:56px;height:56px;
-  border-radius:8px;
-  overflow:hidden;
-  cursor:grab;
+  width:56px;height:56px;border-radius:8px;
+  overflow:hidden;cursor:grab;
+  touch-action:none;
 }
 .brawler img{width:100%;height:100%;object-fit:cover}
 .brawler.dragging{
   position:fixed;
-  z-index:9999;
+  z-index:2000;
   pointer-events:none;
   cursor:grabbing;
 }
@@ -79,35 +93,6 @@ html,body{margin:0;font-family:system-ui,Arial,sans-serif;color:#fff}
   margin-top:12px;
   border:2px dashed rgba(255,255,255,.2);
   margin-bottom:calc(24px + env(safe-area-inset-bottom));
-}
-
-/* ===== CREDIT ===== */
-#credit{
-  position:fixed;
-  right:14px;
-  top:14px;
-  padding:10px 16px;
-  border-radius:16px;
-  pointer-events:none;
-  background:
-    linear-gradient(135deg,rgba(120,140,255,.35),rgba(200,120,255,.35)),
-    rgba(10,10,18,.92);
-  backdrop-filter:blur(10px);
-  box-shadow:0 0 30px rgba(150,120,255,.9);
-}
-#credit span{
-  font-size:18px;
-  font-weight:900;
-  background:linear-gradient(135deg,#9bb4ff,#d79bff,#9bffef);
-  background-size:300% 300%;
-  -webkit-background-clip:text;
-  -webkit-text-fill-color:transparent;
-  animation:glow 3s ease infinite;
-}
-@keyframes glow{
-  0%{background-position:0% 50%}
-  50%{background-position:100% 50%}
-  100%{background-position:0% 50%}
 }
 </style>
 </head>
@@ -124,7 +109,6 @@ html,body{margin:0;font-family:system-ui,Arial,sans-serif;color:#fff}
 </div>
 
 <div id="tierlist">
-
   <div class="tier"><div class="tier-label imba">ИМБА</div><div class="tier-content" data-tier="imba"></div></div>
   <div class="tier"><div class="tier-label strong">ОЧЕНЬ СИЛЬНЫЕ</div><div class="tier-content" data-tier="strong"></div></div>
   <div class="tier"><div class="tier-label good">ХОРОШИЕ</div><div class="tier-content" data-tier="good"></div></div>
@@ -135,17 +119,14 @@ html,body{margin:0;font-family:system-ui,Arial,sans-serif;color:#fff}
     <div class="tier-label">ВСЕ</div>
     <div class="tier-content" data-tier="pool"></div>
   </div>
-
 </div>
 
-<div id="credit"><span>Lapizxx</span></div>
-
 <script>
+/* ================= DATA ================= */
 const STORAGE_KEY='bs-tierlist';
 const IMG_PATH='brawlers/';
 
-/* ===== BRAWLERS (Buzz Lightyear УДАЛЁН) ===== */
-const brawlers=[
+const brawlers = [
   {id:'gigi',file:'GIGI_portrait.png'},
   {id:'pierce',file:'PIERCE_portrait.png'},
   {id:'glouber',file:'Glouber_portrait.PNG'},
@@ -248,27 +229,21 @@ const brawlers=[
   {id:'ziggi',file:'ziggi_portrait.png'}
 ];
 
-let saved=JSON.parse(localStorage.getItem(STORAGE_KEY)||'{}');
-let dragItem=null;
+let saved = JSON.parse(localStorage.getItem(STORAGE_KEY)||'{}');
+let dragItem = null;
 
-/* ===== RENDER ===== */
+/* ================= RENDER ================= */
 function render(){
   document.querySelectorAll('.tier-content').forEach(z=>z.innerHTML='');
   brawlers.forEach(b=>{
     const el=document.createElement('div');
     el.className='brawler';
-    el.dataset.id=b.id;
     el.innerHTML=`<img src="${IMG_PATH+b.file}">`;
 
-    el.draggable=true;
-    el.ondragstart=e=>{
-      dragItem=b.id;
-      e.dataTransfer.setData('text/plain',b.id);
-    };
-
-    el.addEventListener('touchstart',e=>{
-      dragItem=b.id;
+    el.addEventListener('pointerdown',e=>{
+      dragItem=el;
       el.classList.add('dragging');
+      el.setPointerCapture(e.pointerId);
     });
 
     const tier=saved[b.id]||'pool';
@@ -276,50 +251,49 @@ function render(){
   });
 }
 
-document.querySelectorAll('.tier-content').forEach(zone=>{
-  zone.ondragover=e=>e.preventDefault();
-  zone.ondrop=e=>{
-    e.preventDefault();
-    const id=e.dataTransfer.getData('text/plain');
-    saved[id]=zone.dataset.tier;
-    localStorage.setItem(STORAGE_KEY,JSON.stringify(saved));
-    render();
-  };
-});
-
-/* ===== TOUCH DROP ===== */
-document.addEventListener('touchend',e=>{
+document.addEventListener('pointermove',e=>{
   if(!dragItem)return;
-  const t=e.changedTouches[0];
-  const el=document.elementFromPoint(t.clientX,t.clientY);
+  dragItem.style.left=(e.clientX-28)+'px';
+  dragItem.style.top =(e.clientY-28)+'px';
+  const el=document.elementFromPoint(e.clientX,e.clientY);
   const zone=el?.closest('.tier-content');
   if(zone){
-    saved[dragItem]=zone.dataset.tier;
-    localStorage.setItem(STORAGE_KEY,JSON.stringify(saved));
+    const img=dragItem.querySelector('img').src.split('/').pop();
+    const b=brawlers.find(x=>x.file===img);
+    if(b) saved[b.id]=zone.dataset.tier;
   }
-  document.querySelectorAll('.brawler').forEach(b=>b.classList.remove('dragging'));
-  dragItem=null;
-  render();
 });
 
-/* ===== PNG (Tiermaker style) ===== */
+document.addEventListener('pointerup',()=>{
+  if(!dragItem)return;
+  dragItem.classList.remove('dragging');
+  dragItem.style.left='';
+  dragItem.style.top='';
+  localStorage.setItem(STORAGE_KEY,JSON.stringify(saved));
+  render();
+  dragItem=null;
+});
+
+/* ================= PNG ================= */
 function downloadImage(){
-  html2canvas(document.getElementById('tierlist'),{backgroundColor:null,scale:2,useCORS:true})
-  .then(canvas=>{
-    canvas.toBlob(blob=>{
-      const url=URL.createObjectURL(blob);
+  html2canvas(document.getElementById('tierlist'),{
+    backgroundColor:null,
+    useCORS:true,
+    scale:2
+  }).then(c=>{
+    c.toBlob(b=>{
+      const u=URL.createObjectURL(b);
       const a=document.createElement('a');
-      a.href=url;
-      a.download='tierlist.png';
+      a.href=u;a.download='tierlist.png';
       document.body.appendChild(a);
       a.click();
-      document.body.removeChild(a);
-      setTimeout(()=>URL.revokeObjectURL(url),1000);
-    },'image/png');
+      a.remove();
+      setTimeout(()=>URL.revokeObjectURL(u),1000);
+    });
   });
 }
 
-/* ===== JSON ===== */
+/* ================= JSON ================= */
 function exportJSON(){
   const b=new Blob([JSON.stringify(saved,null,2)],{type:'application/json'});
   const a=document.createElement('a');
@@ -342,13 +316,12 @@ function importJSON(){
   i.click();
 }
 
-/* ===== PARTICLES ===== */
-const c=document.getElementById('particles');
-const ctx=c.getContext('2d');
+/* ================= PARTICLES ================= */
+const c=document.getElementById('particles'),ctx=c.getContext('2d');
 let W,H,parts=[];
 function resize(){W=c.width=innerWidth;H=c.height=innerHeight}
 resize();addEventListener('resize',resize);
-for(let i=0;i<70;i++)parts.push({x:Math.random()*W,y:Math.random()*H,r:Math.random()*2+1,v:Math.random()*0.3+0.1});
+for(let i=0;i<60;i++)parts.push({x:Math.random()*W,y:Math.random()*H,r:Math.random()*2+1,v:Math.random()*0.4+0.1});
 (function loop(){
   ctx.clearRect(0,0,W,H);
   ctx.fillStyle='rgba(180,160,255,.35)';
@@ -361,5 +334,7 @@ for(let i=0;i<70;i++)parts.push({x:Math.random()*W,y:Math.random()*H,r:Math.rand
 
 render();
 </script>
+
+<script src="credit.js"></script>
 </body>
 </html>
